@@ -1,0 +1,66 @@
+name: Env Approval Test
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          sleep 20
+          echo "setup done"
+
+  # Two jobs on the SAME environment.
+  # Question: do they queue (run one after another) or run in parallel?
+  same-env-a:
+    runs-on: ubuntu-latest
+    environment: env-b
+    steps:
+      - run: |
+          echo "same-env-a start: $(date +%T)"
+          sleep 20
+          echo "same-env-a end: $(date +%T)"
+
+  same-env-b:
+    runs-on: ubuntu-latest
+    environment: env-a
+    steps:
+      - run: |
+          echo "same-env-b start: $(date +%T)"
+          sleep 20
+          echo "same-env-b end: $(date +%T)"
+
+  # Two jobs on DIFFERENT environments, for comparison.
+  diff-env-a:
+    needs: setup
+    runs-on: ubuntu-latest
+    environment: env-a
+    steps:
+      - run: |
+          echo "diff-env-a start: $(date +%T)"
+          sleep 20
+          echo "diff-env-a end: $(date +%T)"
+
+  diff-env-b:
+    needs: setup
+    runs-on: ubuntu-latest
+    environment: env-b
+    steps:
+      - run: |
+          echo "diff-env-b start: $(date +%T)"
+          sleep 20
+          echo "diff-env-b end: $(date +%T)"
+
+  shared-env:
+    needs: setup
+    runs-on: ubuntu-latest
+    environment: shared-env
+    steps:
+      - run: |
+          echo "diff-env-b start: $(date +%T)"
+          sleep 20
+          echo "diff-env-b end: $(date +%T)"
